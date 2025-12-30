@@ -32,10 +32,17 @@ fileindex search main
 
 ### Other Installation Methods
 
-**Using uv (fastest):**
+**Using uv (fastest project add):**
 ```bash
 uv add fileindex
 uv run fileindex scan .
+```
+
+**Using uv as a global tool:**
+```bash
+uv tool install fileindex
+# ensure uv's bin dir is on PATH, then
+fileindex scan .
 ```
 
 **Using pipx (isolated CLI tool):**
@@ -56,7 +63,7 @@ pip install -e .
 - **OS:** Windows, macOS, or Linux
 - **Disk:** ~100 KB for the package
 
-You should see the welcome screen with command information.
+After install, running `fileindex` should show the welcome screen with commands.
 
 ## Quick Start
 
@@ -153,7 +160,7 @@ fileindex search . --ext py --path src --min-size 5000
 ## Cache Location
 
 - **Linux/macOS**: `~/.fileindex/index.json`
-- **Windows**: `C:\Users\YourUsername\AppData\Roaming\.fileindex\index.json`
+- **Windows**: `C:\Users\<YourUser>\AppData\Roaming\.fileindex\index.json`
 
 ## Performance
 
@@ -194,6 +201,11 @@ Run the comprehensive test suite:
 python3 -m unittest discover -s tests -p "test_*.py" -v
 ```
 
+## Support & Issues
+
+- Report bugs or feature requests: https://github.com/Dhritikrishna123/file-index/issues
+- Repository: https://github.com/Dhritikrishna123/file-index
+
 61+ tests covering:
 - Directory scanning
 - Search functionality
@@ -218,7 +230,7 @@ fileindex/
 │       └── cache.py
 ├── tests/                  # Test suite (61+ tests)
 ├── README.md
-├── INSTALL.md
+├── (dist/ created when you build)
 ├── LICENSE
 ├── setup.py
 └── pyproject.toml
