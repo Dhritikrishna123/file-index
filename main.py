@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import time
 
 from cli.welcome import show_welcome
 from cli.style import Style
@@ -49,7 +50,6 @@ def search_cmd(args):
         )
         return
 
-    # CASE 1: fileindex search <query>
     if len(args) == 1:
         query = args[0]
         path = cache.get_last_root()
@@ -62,8 +62,6 @@ def search_cmd(args):
                 style=Style.ERROR,
             )
             return
-
-    # CASE 2: fileindex search <path> <query>
     else:
         path = args[0]
         query = args[1]
@@ -76,8 +74,7 @@ def search_cmd(args):
             records = Scan(path).run()
             cache.save(path, records)
 
-        search = Search(records)
-        results = search.by_name(query)
+        results = Search(records).by_name(query)
 
         style.preety(
             f" Found {len(results)} results ",
@@ -91,6 +88,29 @@ def search_cmd(args):
 
     except (FileNotFoundError, NotADirectoryError) as e:
         style.preety(f" {e} ", 70, "!", Style.ERROR)
+
+
+def status_cmd():
+    data = cache.load()
+
+    if not data:
+        style.preety(
+            " No cache found ",
+            width=70,
+            char="!",
+            style=Style.ERROR,
+        )
+        return
+
+    scanned_time = time.strftime(
+        "%Y-%m-%d %H:%M:%S",
+        time.localtime(data["scanned_at"]),
+    )
+
+    style.preety(" Cache Status ", 70, "-", Style.INFO)
+    print(f"Root        : {data['root']}")
+    print(f"Files       : {data['file_count']}")
+    print(f"Scanned At  : {scanned_time}")
 
 
 def dispatch():
@@ -107,6 +127,8 @@ def dispatch():
         scan_cmd(command_args)
     elif command == "search":
         search_cmd(command_args)
+    elif command == "status":
+        status_cmd()
     else:
         style.preety(
             f" Unknown command: {command} ",
