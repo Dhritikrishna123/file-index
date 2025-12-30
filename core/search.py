@@ -10,7 +10,7 @@ class Search:
         Case insensitive substring matching on filename
         """
         query = query.lower()
-        return[
+        return [
             r for r in self.records
             if query in r["name"].lower()
         ]

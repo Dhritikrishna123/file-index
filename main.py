@@ -113,6 +113,20 @@ def status_cmd():
     print(f"Scanned At  : {scanned_time}")
 
 
+def cache_clear_cmd():
+    if not cache.has_cache():
+        style.preety(" Cache is already empty ", 70, " ", style.WARNING)
+        return
+
+    cache.clear()
+    style.preety(
+            " cache cleared successfully ",
+            70,
+            " ",
+            style.SUCCESS,
+        )
+
+
 def dispatch():
     args = sys.argv[1:]
 
@@ -129,6 +143,8 @@ def dispatch():
         search_cmd(command_args)
     elif command == "status":
         status_cmd()
+    elif command == "cache" and command_args == ["clear"]:
+        cache_clear_cmd()
     else:
         style.preety(
             f" Unknown command: {command} ",
