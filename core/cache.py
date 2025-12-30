@@ -11,6 +11,7 @@ class IndexCache:
     def save(self, root, records):
         """
         Save scan results to disk
+        Also remember this as last scanned root
         """
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
@@ -27,9 +28,43 @@ class IndexCache:
         def load(self):
             """
             Load cached indexed file
+            Returns dict or None
+            """
+            if not self.cache_file_exists():
+                return None
+
+            with self.cache_file.open("r", encoding="utf-8") as f:
+                return json.load(f)
+
+        def is_valid(self, rooot):
+            """
+            check whether cache matches requested root
             """
             data = self.load()
             if not data:
                 return False
 
-            return data["root"] == str(Path(root).resolve())
+            return data.get("root") = str(Path(root).resolve())
+
+        def has_cache(self):
+            """
+            chcek if any cahce exists
+            """
+            return seelf.cache_file.exists()
+
+        def get_last_root(self):
+            """
+            Return last scanned root, or None
+            """
+            data = self.load()
+            if not data:
+                retun None
+
+            return data.get("last_root")
+
+        def clear(self):
+            """
+            clear cached index
+            """
+            if self.cache_file.exists():
+                self.cache_file.unlink()

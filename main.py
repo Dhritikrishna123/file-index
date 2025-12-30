@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
+import sys
+
 from cli.welcome import show_welcome
 from cli.style import Style
 from core.scan import Scan
 from core.search import Search
-import sys
+from core.cache import IndexCache
 
 
 style = Style()
+cache = IndexCache()
 
 
 def scan_cmd(args):
@@ -22,8 +25,8 @@ def scan_cmd(args):
     path = args[0]
 
     try:
-        scanner = Scan(path)
-        records = scanner.run()
+        records = Scan(path).run()
+        cache.save(path, records)
 
         style.preety(
             f" Indexed {len(records)} files ",
@@ -33,29 +36,46 @@ def scan_cmd(args):
         )
 
     except (FileNotFoundError, NotADirectoryError) as e:
-        style.preety(
-            f" {e} ",
-            width=70,
-            char="!",
-            style=Style.ERROR,
-        )
+        style.preety(f" {e} ", 70, "!", Style.ERROR)
 
 
 def search_cmd(args):
-    if len(args) < 2:
+    if not args:
         style.preety(
-            " Usage: fileindex search <path> <query> ",
+            " Usage: fileindex search <query>  OR  fileindex search <path> <query> ",
             width=70,
             char=" ",
             style=Style.WARNING,
         )
         return
 
-    path = args[0]
-    query = args[1]
+    # CASE 1: fileindex search <query>
+    if len(args) == 1:
+        query = args[0]
+        path = cache.get_last_root()
+
+        if not path:
+            style.preety(
+                " No cached index found. Run: fileindex scan <path> ",
+                width=70,
+                char="!",
+                style=Style.ERROR,
+            )
+            return
+
+    # CASE 2: fileindex search <path> <query>
+    else:
+        path = args[0]
+        query = args[1]
 
     try:
-        records = Scan(path).run()
+        if cache.is_valid(path):
+            data = cache.load()
+            records = data["records"]
+        else:
+            records = Scan(path).run()
+            cache.save(path, records)
+
         search = Search(records)
         results = search.by_name(query)
 
@@ -66,7 +86,7 @@ def search_cmd(args):
             style=Style.INFO,
         )
 
-        for r in results[:10]:  # limit output
+        for r in results[:10]:
             print(r["path"])
 
     except (FileNotFoundError, NotADirectoryError) as e:
