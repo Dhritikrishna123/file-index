@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class Search:
     def __init__(self, records):
         """
@@ -35,7 +38,7 @@ class Search:
             results = [r for r in results if r["size"] >= min_size]
 
         if max_size is not None:
-            result = [r for r in result if r["size"] <= max_size]
+            results = [r for r in results if r["size"] <= max_size]
 
         return results
 
@@ -48,3 +51,22 @@ class Search:
             r for r in self.records
             if substring in r["path"].lower()
         ]
+
+    def find_duplicates(self):
+        """
+        Find duplicate files based on content hash.
+        Returns dict: hash -> list of records (len >= 2)
+        """
+        groups = defaultdict(list)
+
+        for r in self.records:
+            h = r.get("hash")
+            if h:
+                groups[h].append(r)
+
+        # keep only actual duplicates
+        return {
+            h: files
+            for h, files in groups.items()
+            if len(files) > 1
+        }

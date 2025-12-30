@@ -44,13 +44,13 @@ class IndexCache:
         if not data:
             return False
 
-        return data.get("root") == str(Path(root).resolve())
+        return data.get("root") == str(Path(root).expanduser().resolve())
 
     def has_cache(self):
         """
-        chcek if any cahce exists
+        check if any cahce exists
         """
-        return seelf.cache_file.exists()
+        return self.cache_file.exists()
 
     def get_last_root(self):
         """
@@ -60,7 +60,17 @@ class IndexCache:
         if not data:
             return None
 
-        return data.get("last_root") or data.get("root")
+        return data.get("root")
+
+    def get_records(self):
+        """
+        Return cached records or empty list
+        Useful for incremental scans
+        """
+        data = self.load()
+        if not data:
+            return []
+        return data.get("records", [])
 
     def clear(self):
         """

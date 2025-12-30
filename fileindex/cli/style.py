@@ -60,6 +60,6 @@ class Style:
     def apply(*styles):
         return "".join(styles)
 
-    def preety(self, title, width=70, char="+", style=""):
+    def pretty(self, title, width=70, char="+", style=""):
         centred = title.center(width, char)
         print(style + centred + self.RESET)

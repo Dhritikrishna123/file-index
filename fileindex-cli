@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""
+fileindex - Fast local file indexing and search tool
+Entry point for Unix-like systems
+"""
+import sys
+from fileindex.main import main
+
+if __name__ == "__main__":
+    sys.exit(main())
